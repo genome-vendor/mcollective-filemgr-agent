@@ -24,6 +24,48 @@ module MCollective
         status
       end
 
+      # Find files in provided directory. Optionally recurse through subdirectories
+      # or limit results by file mtime.
+      action "find" do
+        base_dir = request.data[:directory]
+        age_minutes = request.data[:age_minutes]
+        age_hours = request.data[:age_hours]
+        age_days = request.data[:age_days]
+        recurse = request.data[:recurse]
+
+        age = nil
+        if !age_minutes.nil?
+          age = Time.now - (60 * age_minutes)
+        elsif !age_hours.nil?
+          age = Time.now - (60 * 60 * age_hours)
+        elsif !age_days.nil?
+          age = Time.now - (60 * 60 * 24 * age_days)
+        end
+
+        files = Array.new
+        Find.find(base_dir) do |path|
+          if FileTest.directory?(path)
+            if recurse or path == base_dir
+              next
+            else
+              Find.prune
+            end
+          elsif FileTest.file?(path)
+            if !age.nil?
+              mtime = File.mtime(path)
+              if (mtime <=> age) == -1
+                files.push(path)
+              else
+                next
+              end
+            else
+              files.push(path)
+            end
+          end
+        end
+        reply[:file] = files
+      end
+
       def get_filename
         request[:file] || config.pluginconf["filemgr.touch_file"] || "/var/run/mcollective.plugin.filemgr.touch"
       end

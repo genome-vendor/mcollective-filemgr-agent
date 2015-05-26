@@ -4,7 +4,7 @@ metadata    :name        => "filemgr",
             :license     => "ASL 2.0",
             :version     => "1.1.0",
             :url         => "http://www.puppetlabs.com/mcollective",
-            :timeout     => 5
+            :timeout     => 120
 
 requires :mcollective => "2.2.1"
 
@@ -109,3 +109,43 @@ action "status", :description => "Basic information about a file" do
            :description => "Directory Listing",
            :display_as => "Directory Listing"
 end
+
+action "find", :description => "Find files in directory" do
+    input :directory,
+          :prompt      => "Directory",
+          :description => "Directory in which to find files",
+          :type        => :string,
+          :validation  => '^/.+$',
+          :optional    => false,
+          :maxlength   => 256
+
+    input :recurse,
+          :prompt      => "Recurse",
+          :description => "Set to true to recurse into subdirectories",
+          :type        => :boolean,
+          :optional    => true,
+          :default     => true
+
+    input :age_minutes,
+          :prompt      => "Age (minutes)",
+          :description => "Minimum age in minutes for file to be included in output",
+          :type        => :integer,
+          :optional    => true
+
+    input :age_hours,
+          :prompt      => "Age (hours)",
+          :description => "Minimum age in hours for file to be included in output",
+          :type        => :integer,
+          :optional    => true
+
+    input :age_days,
+          :prompt      => "Age (days)",
+          :description => "Minimum age in days for file to be included in output",
+          :type        => :integer,
+          :optional    => true
+
+    output :file,
+           :description => "File path",
+           :display_as  => "File"
+end
+

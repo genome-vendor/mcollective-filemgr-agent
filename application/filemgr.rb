@@ -39,8 +39,17 @@ class MCollective::Application::Filemgr<MCollective::Application
         end
       end
 
+    when "find"
+      printrpc mc.find(
+        :directory   => configuration[:directory],
+        :recurse     => configuration[:recurse], 
+        :age_minutes => configuration[:age_minutes],
+        :age_hours   => configuration[:age_hours],
+        :age_days    => configuration[:age_days]
+      )
+
     else
-      puts "Valid commands are 'touch', 'status', and 'remove'"
+      puts "Valid commands are 'touch', 'status', 'find', and 'remove'"
       exit 1
     end
 
